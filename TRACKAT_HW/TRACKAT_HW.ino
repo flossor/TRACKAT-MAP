@@ -4,8 +4,8 @@
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
 
-int const RX_SIM        = 8;
-int const TX_SIM        = 7;
+int const RX_SIM        = 10;
+int const TX_SIM        = 9;
 
 int const RX_GPS        = 3;
 int const TX_GPS        = 4;
@@ -18,10 +18,12 @@ int const GPS_BAUD      = 9600;
 SoftwareSerial sim(RX_SIM, TX_SIM);
 SoftwareSerial GPSserial(RX_GPS, TX_GPS);
 
-String const SERVER_NBR = "+14175573752";
-String const DEVICE_ID  = "34en094nrng";
+TinyGPSPlus gps;
 
-int const DELAY_MS      = 5*60*1000;
+String const SERVER_NBR = "+14175573752";
+int const DEVICE_ID  = 0;
+
+int const DELAY_MS      = 10*1000;
 int currentTime         = 0;
 
 double longitude        = 0;
@@ -46,7 +48,10 @@ void loop() {
 
   if (millis() - currentTime > DELAY_MS){
     transmit();
+    currentTime = millis();
   }
+  Serial.print((millis() - currentTime)/1000);
+  Serial.println(" Seconds");
   
   
   
@@ -77,10 +82,11 @@ void transmit(){
   //Serial.println ("Set SMS Number");
   sim.println("AT+CMGS=\"" + SERVER_NBR + "\"\r"); //Mobile phone number to send message
   delay(200);
-  String data = "{\"id\":\""+DEVICE_ID+"\",\n\r\"lat\":"+String(latitude,6)+",\n\r\"long\":"+String(longitude,6)+",\n\r\"battery\":"+String(battery,2)+"}";
+  String data = "{\"id\":\""+String(DEVICE_ID)+"\",\n\r\"lat\":"+String(latitude,6)+",\n\r\"long\":"+String(longitude,6)+",\n\r\"battery\":"+String(battery,2)+"}";
   sim.println(data);
   delay(100);
   sim.println((char)26);// ASCII code of CTRL+Z
   delay(200);
   Serial.println("Transmitted");
+  Serial.println(data);
 }

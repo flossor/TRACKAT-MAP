@@ -41,14 +41,13 @@ class Device(base):
 class Location(base):
     __tablename__ = "locations"
 
-    location_id = Column("location_id",Integer,primary_key=True)
+    location_id = Column("location_id",Integer,primary_key=True, autoincrement=True)
     lattitude = Column("lattitude", FLOAT)
     longitude = Column("longitude", FLOAT)
     device_id = Column(Integer, ForeignKey("devices.device_id"))
     time = Column("time", DateTime)
 
-    def __init__(self, location_id, lattitude, longitude, device_id, time):
-        self.location_id = location_id
+    def __init__(self, lattitude, longitude, device_id, time):
         self.lattitude = lattitude
         self.longitude = longitude
         self.device_id = device_id
@@ -74,9 +73,16 @@ def get_devices(profile_id):
 def add_device(profile_id, device_id):
     pass
 def get_locations(device_id:int):
+    '''
+    Get all the locations associated with a device
+    '''
     locations = session.query(Location).filter(Location.device_id == device_id)
     return locations
+
 def add_location(device_id, latitude, longitude, time):
-    location = Location(0,latitude,longitude,device_id,time)
+    '''
+    Add location to the database
+    '''
+    location = Location(latitude,longitude,device_id,time)
     session.add(location)
     session.commit()

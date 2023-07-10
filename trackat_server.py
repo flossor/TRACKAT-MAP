@@ -3,6 +3,9 @@ from functools import wraps
 import jwt
 from twilio import twiml
 import json
+import datetime
+
+import TK_database as database
 
 
 app = Flask(__name__)
@@ -14,32 +17,48 @@ app.config['SECRET_KEY'] = 'kat'
 #     @wraps(f)
 #     def decorated(*args,**kwargs):
 #         token = request.args.get('token')
+
+@app.route("/", methods=['GET'])
+def home():
+    return "<h1>TRACKAT API</h1>"
         
-#45.547642, -73.578529
-#45.56610413809432, -73.55540981666361
 @app.route('/receive_data',methods=['GET','POST'])
 def sms():
     # number = request.form['FROM']
-    # body = request.form["BODY"]
-    #print(request.form['Body'])
+
     if request.form:
         body = request.form["Body"]
         print(body)
+        info = json.loads(body)
+        save_location(info)
 
-    info = {"id":"38547r8e","lat":45.609119,"long":-73.527718,"battery":80}
+        return 200
    
 
-
-    return info
+    return 400
 
 @app.route('/locations', methods=['GET', 'POST'])
 def locations():
-    
-    if request.form:
-        pass
+    '''
+    Get the list of all locations
+    '''
 
-def save_location():
-    pass
+    locations = database.get_locations(0)
+    locations_response = {}
+
+    for i in range(locations.count()):
+        locations_response[str(i+1)] = {"date" : locations[i].time, "latitude" : locations[i].lattitude, "longitude" : locations[i].longitude}
+
+
+    return locations_response
+
+def save_location(info):
+    '''
+    Save location to the database
+    '''
+
+    database.add_location(info["id"],info["lat"],info["long"], datetime.datetime.now())
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
