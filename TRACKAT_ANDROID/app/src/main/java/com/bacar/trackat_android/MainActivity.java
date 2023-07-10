@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             sendGetRequest();
-            handler.postDelayed(this, 5000);
+            handler.postDelayed(this, 30000);
         }
     };
 
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                                     +String.format(Locale.ENGLISH, "%02d", date.getMinutes())+":"
                                     +String.format(Locale.ENGLISH, "%02d", date.getSeconds())
                                     +" " + String.format(Locale.ENGLISH, "%02d", date.getDate())+"/"
-                                    +String.format(Locale.ENGLISH, "%02d", date.getMonth())+"/"
+                                    +String.format(Locale.ENGLISH, "%02d", date.getMonth()+1)+"/"
                                     +(date.getYear()+1900)
                                     +"\n";
 
