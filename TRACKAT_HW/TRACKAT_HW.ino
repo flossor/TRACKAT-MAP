@@ -4,8 +4,8 @@
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
 
-int const RX_SIM        = 10;
-int const TX_SIM        = 9;
+int const RX_SIM        = 9;
+int const TX_SIM        = 10;
 
 int const RX_GPS        = 3;
 int const TX_GPS        = 4;
@@ -23,35 +23,45 @@ TinyGPSPlus gps;
 String const SERVER_NBR = "+14175573752";
 int const DEVICE_ID  = 0;
 
-int const DELAY_MS      = 10*1000;
-int currentTime         = 0;
+unsigned long const TIME_DELAY      = 60000;
+long lastTime         = 0;
 
-double longitude        = 0;
-double latitude         = 0;
+double longitude        = -1;
+double latitude         = -1;
 double battery          = 0;
 
 void setup() {
 
   delay(2000);
-  Serial.begin(9600);
-  sim.begin(9600);
+  Serial.begin(SERIAL_BAUD);
+  sim.begin(SIM_BAUD);
   GPSserial.begin(GPS_BAUD);
   delay(1000);
-  currentTime = millis();
+  lastTime = millis();
   
 
 }
 
 void loop() {
 
-  getPosition();
+  
+  long timePassed = (millis() - lastTime);
+ 
+  Serial.print(timePassed/1000);
+  Serial.print("sec Since Last Transmission... | Current Location[");
+  Serial.print(latitude);
+  Serial.print(", ");
+  Serial.print(longitude);
+  Serial.println("]");
 
-  if (millis() - currentTime > DELAY_MS){
+  getPosition();
+  
+  if (timePassed > TIME_DELAY){
+    lastTime = millis();
     transmit();
-    currentTime = millis();
+    
   }
-  Serial.print((millis() - currentTime)/1000);
-  Serial.println(" Seconds");
+  
   
   
   
@@ -61,14 +71,10 @@ void loop() {
 void getPosition(){
   while (GPSserial.available() > 0){
     if (gps.encode(GPSserial.read())){
-      if (gps.location.isUpdated()){
-//        Serial.print("Latitude: ");
-//        Serial.println(gps.location.lat(),6);
-//        
-//        Serial.print("Longitude: ");
-//        Serial.println(gps.location.lng(),6);
+      if (gps.location.isUpdated()){    
         longitude = gps.location.lng();
         latitude = gps.location.lat();
+
       }
     }
   }
