@@ -1,5 +1,8 @@
 /**
  * TRACKAT
+ * 
+ * Maxim Bacar
+ * COEN 390
  */
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
@@ -26,8 +29,8 @@ int const DEVICE_ID  = 0;
 unsigned long const TIME_DELAY      = 60000;
 long lastTime         = 0;
 
-double longitude        = -1;
-double latitude         = -1;
+double longitude        = -73.555457;
+double latitude         = 45.56616;
 double battery          = 0;
 
 void setup() {
@@ -62,10 +65,6 @@ void loop() {
     
   }
   
-  
-  
-  
-
 }
 
 void getPosition(){
@@ -81,7 +80,9 @@ void getPosition(){
   
 }
 
-
+/**
+ * Transmit data via GSM to the server
+ */
 void transmit(){
   sim.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
   delay(200);
